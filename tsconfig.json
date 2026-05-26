@@ -28,7 +28,9 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"]
-    }
+    },
+
+    "noImplicitAny": false
   },
   "include": [
     "next-env.d.ts",
