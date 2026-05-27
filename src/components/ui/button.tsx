@@ -19,6 +19,8 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",
+        notebook:
+          "bg-transparent border-0 rounded-none text-[20px] font-normal text-[#6f8db8] underline decoration-wavy decoration-[#6f8db8]/60 underline-offset-4 hover:text-[#d96456] hover:decoration-[#d96456]/60 font-[family-name:var(--font-caveat)]",
       },
       size: {
         default:
@@ -34,6 +36,12 @@ const buttonVariants = cva(
         "icon-lg": "size-9",
       },
     },
+    compoundVariants: [
+      {
+        variant: "notebook",
+        className: "h-auto px-0 py-0 gap-0",
+      },
+    ],
     defaultVariants: {
       variant: "default",
       size: "default",

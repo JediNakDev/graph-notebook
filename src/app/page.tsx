@@ -1,19 +1,16 @@
 "use client";
 
 import {
-  Background,
-  Controls,
-  MiniMap,
-  ReactFlow,
   addEdge,
   applyEdgeChanges,
   applyNodeChanges,
   type Edge,
   type Node,
 } from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
 import { Caveat, Newsreader } from "next/font/google";
 import { useCallback, useState } from "react";
+import NodeDisplay from "~/components/node_display";
+import NodeInput from "~/components/node_input";
 import { INITIAL_NODES, INITIAL_EDGES } from "./constant";
 
 const hand = Caveat({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
@@ -25,53 +22,28 @@ const paperBg =
 export default function Page() {
   const [nodes, setNodes] = useState<Node[]>(INITIAL_NODES as unknown as Node[]);
   const [edges, setEdges] = useState<Edge[]>(INITIAL_EDGES as unknown as Edge[]);
-  const [text, setText] = useState("");
   const [jot, setJot] = useState<string[]>([
     "Internet → Web Server → Database",
     "remember to label everything ✦",
   ]);
 
-  const onNodesChange = useCallback((c: any) => setNodes((s) => applyNodeChanges(c, s)), []);
-  const onEdgesChange = useCallback((c: any) => setEdges((s) => applyEdgeChanges(c, s)), []);
-  const onConnect = useCallback((p: any) => setEdges((s) => addEdge(p, s)), []);
+  const onNodesChange = useCallback(
+    (changes: Parameters<typeof applyNodeChanges<Node>>[0]) =>
+      setNodes((s) => applyNodeChanges(changes, s)),
+    [],
+  );
+  const onEdgesChange = useCallback(
+    (changes: Parameters<typeof applyEdgeChanges<Edge>>[0]) =>
+      setEdges((s) => applyEdgeChanges(changes, s)),
+    [],
+  );
+  const onConnect = useCallback(
+    (params: Parameters<typeof addEdge<Edge>>[0]) =>
+      setEdges((s) => addEdge(params, s)),
+    [],
+  );
 
-  const note = (m: string) => setJot((h) => [...h.slice(-6), m]);
-
-  const exec = () => {
-    const list = text.split(/\s+/);
-    const cmd = list[0]?.toLowerCase();
-    if (cmd === "add" && list[1]?.toLowerCase() === "node") {
-      const label = list.slice(2).join(" ");
-      setNodes((p) => [...p, { id: crypto.randomUUID(), data: { label }, position: { x: Math.random() * 400, y: Math.random() * 280 } }]);
-      note(`✎ added node "${label}"`);
-    } else if (cmd === "add" && list[1]?.toLowerCase() === "edge" && list[2]?.toLowerCase() === "from") {
-      const i = list.indexOf("to");
-      if (i < 0) return setText("");
-      const sLabel = list.slice(3, i).join(" ");
-      const tLabel = list.slice(i + 1).join(" ");
-      const s = nodes.find((n: any) => n.data.label === sLabel)?.id;
-      const t = nodes.find((n: any) => n.data.label === tLabel)?.id;
-      if (s && t) {
-        setEdges((p) => [...p, { id: crypto.randomUUID(), source: s, target: t }]);
-        note(`✎ ${sLabel} → ${tLabel}`);
-      }
-    } else if (cmd === "remove" && list[1]?.toLowerCase() === "node") {
-      const label = list.slice(2).join(" ");
-      const ids = nodes.filter((n: any) => n.data.label === label).map((n) => n.id);
-      setNodes((p) => p.filter((n) => !ids.includes(n.id)));
-      note(`✗ removed "${label}"`);
-    } else if (cmd === "remove" && list[1]?.toLowerCase() === "edge" && list[2]?.toLowerCase() === "from") {
-      const i = list.indexOf("to");
-      if (i < 0) return setText("");
-      const sLabel = list.slice(3, i).join(" ");
-      const tLabel = list.slice(i + 1).join(" ");
-      const s = nodes.find((n: any) => n.data.label === sLabel)?.id;
-      const t = nodes.find((n: any) => n.data.label === tLabel)?.id;
-      setEdges((p) => p.filter((n) => n.source !== s || n.target !== t));
-      note(`✗ ${sLabel} ⇸ ${tLabel}`);
-    }
-    setText("");
-  };
+  const log = (m: string) => setJot((h) => [...h.slice(-6), m]);
 
   return (
     <div
@@ -83,9 +55,7 @@ export default function Page() {
       {/* horizontal ruling */}
       <div
         className="pointer-events-none fixed inset-0 opacity-[0.18]"
-        style={{
-          backgroundImage: "repeating-linear-gradient(to bottom, transparent 0 31px, #6f8db8 31px 32px)",
-        }}
+        style={{ backgroundImage: "repeating-linear-gradient(to bottom, transparent 0 31px, #6f8db8 31px 32px)" }}
       />
       {/* red margin */}
       <div className="pointer-events-none fixed top-0 bottom-0 left-[88px] w-px bg-[#d96456]/70" />
@@ -96,7 +66,6 @@ export default function Page() {
       <div className="pointer-events-none fixed left-[32px] top-[88%] w-5 h-5 rounded-full bg-[#e8e0cf] shadow-inner border border-[#cdbf9b]" />
 
       <div className="relative z-10 pl-[120px] pr-10 pt-10 pb-12">
-        {/* header */}
         <header className="flex items-end justify-between mb-8">
           <div>
             <div className={`${hand.className} text-[26px] text-[#d96456] -rotate-1 mb-1`}>
@@ -119,7 +88,6 @@ export default function Page() {
         <div className="grid grid-cols-[1fr_340px] gap-8">
           {/* taped canvas */}
           <section className="relative">
-            {/* tape pieces */}
             <div className="absolute -top-3 left-12 w-24 h-7 bg-[#f6e3a1]/75 rotate-[-4deg] shadow-sm z-20"
               style={{ clipPath: "polygon(2% 12%, 98% 4%, 99% 92%, 1% 88%)" }} />
             <div className="absolute -top-3 right-16 w-28 h-7 bg-[#f6e3a1]/75 rotate-[5deg] shadow-sm z-20"
@@ -128,19 +96,13 @@ export default function Page() {
               style={{ clipPath: "polygon(2% 12%, 98% 4%, 99% 92%, 1% 88%)" }} />
 
             <div className="h-[70vh] bg-white border border-[#2a241c]/20 shadow-[0_18px_40px_-20px_rgba(42,36,28,0.35)] rounded-sm overflow-hidden">
-              <ReactFlow
+              <NodeDisplay
                 nodes={nodes}
                 edges={edges}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
-                fitView
-                proOptions={{ hideAttribution: true }}
-              >
-                <Controls />
-                <MiniMap />
-                <Background gap={12} size={1} />
-              </ReactFlow>
+              />
             </div>
 
             <div className={`${hand.className} mt-3 text-[20px] text-[#2a241c]/60 italic flex justify-between`}>
@@ -151,27 +113,20 @@ export default function Page() {
 
           {/* margin notes */}
           <aside className="flex flex-col gap-6">
-            {/* command input — looks like a note slip */}
-            <div className="relative bg-[#fffbf0] border border-[#2a241c]/20 p-5 shadow-[4px_5px_0_-1px_rgba(42,36,28,0.12)] rotate-[0.6deg]">
+            {/* command input (default styled NodeInput, wrapped in a note slip) */}
+            <div className="relative bg-[#fffbf0] border border-[#2a241c]/20 p-5 shadow-[4px_5px_0_-1px_rgba(42,36,28,0.12)]">
               <div className={`${hand.className} absolute -top-3 left-4 bg-[#d96456] text-[#fffbf0] px-2 py-0.5 text-[16px] -rotate-2 rounded-sm`}>
                 tell the graph what to do →
               </div>
-              <div className="flex items-baseline gap-2 border-b border-dashed border-[#2a241c]/30 pb-1 mt-2">
-                <span className={`${hand.className} text-[24px] text-[#d96456]`}>›</span>
-                <input
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && exec()}
-                  placeholder="add node Cache"
-                  className={`${hand.className} flex-1 bg-transparent outline-none text-[24px] placeholder-[#2a241c]/30`}
+              <div className="mt-2">
+                <NodeInput
+                  nodes={nodes}
+                  setNodes={setNodes}
+                  edges={edges}
+                  setEdges={setEdges}
+                  onLog={log}
                 />
               </div>
-              <button
-                onClick={exec}
-                className={`${hand.className} mt-3 text-[20px] text-[#6f8db8] underline decoration-wavy decoration-[#6f8db8]/60 underline-offset-4 hover:text-[#d96456] hover:decoration-[#d96456]/60 transition-colors`}
-              >
-                go on then →
-              </button>
             </div>
 
             {/* grammar — index card */}
