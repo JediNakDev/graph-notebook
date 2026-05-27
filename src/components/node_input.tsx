@@ -4,7 +4,17 @@ import { Button } from "./ui/button";
 import { Field } from "./ui/field";
 import { Input } from "./ui/input";
 
-export default function NodeInput({ nodes, setNodes, edges, setEdges }) {
+export default function NodeInput({
+  nodes,
+  setNodes,
+  edges,
+  setEdges,
+}: {
+  nodes: Node[];
+  setNodes;
+  edges: Edge[];
+  setEdges;
+}) {
   const [text, setText] = useState("");
 
   const handleText = () => {
@@ -19,8 +29,8 @@ export default function NodeInput({ nodes, setNodes, edges, setEdges }) {
             id,
             data: { label },
             position: {
-              x: -250,
-              y: 0,
+              x: Math.random() * 250,
+              y: Math.random() * 250,
             },
           };
           return [...prev, newNode];
@@ -59,6 +69,33 @@ export default function NodeInput({ nodes, setNodes, edges, setEdges }) {
       }
     }
     if (list[0]?.toLowerCase() == "remove") {
+      if (list[1]?.toLowerCase() == "node") {
+        const label = list.slice(2).join(" ");
+        const nodeIds = nodes
+          .filter((n) => n.data.label === label)
+          .map((n) => n.id);
+        const relatedEdges = edges.find;
+        setNodes((prev: Node[]) => {
+          return prev.filter((n) => !nodeIds.includes(n.id));
+        });
+      }
+      if (
+        list[1]?.toLowerCase() == "edge" &&
+        list[2]?.toLowerCase() == "from"
+      ) {
+        const index = list.indexOf("to");
+        if (index == -1) {
+          setText("");
+          return;
+        }
+        const sourceLabel = list.slice(3, index).join(" ");
+        const source = nodes.find((n) => n.data.label === sourceLabel)?.id;
+        const targetLabel = list.slice(index + 1).join(" ");
+        const target = nodes.find((n) => n.data.label === targetLabel)?.id;
+        setEdges((prev: Edge[]) => {
+          return prev.filter((n) => n.source != source || n.target != target);
+        });
+      }
     }
     setText("");
   };
