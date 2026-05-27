@@ -58,6 +58,13 @@ export default function NodeDisplay({ initialNodes, initialEdges }) {
         edges={edges}
         setEdges={setEdges}
       />
+      <h1>Available command</h1>
+      <ul>
+        <li>Add node LABEL</li>
+        <li>Remove node LABEL</li>
+        <li>Add edge from LABEL to LABEL</li>
+        <li>Remove edge from LABEL to LABEL</li>
+      </ul>
     </div>
   );
 }
