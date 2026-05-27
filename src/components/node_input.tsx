@@ -74,9 +74,13 @@ export default function NodeInput({
         const nodeIds = nodes
           .filter((n) => n.data.label === label)
           .map((n) => n.id);
-        const relatedEdges = edges.find;
         setNodes((prev: Node[]) => {
           return prev.filter((n) => !nodeIds.includes(n.id));
+        });
+        setEdges((prev: Edge[]) => {
+          return prev.filter(
+            (n) => !nodeIds.includes(n.source) && !nodeIds.includes(n.target),
+          );
         });
       }
       if (
