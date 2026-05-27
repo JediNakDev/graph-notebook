@@ -1,17 +1,17 @@
 export const INITIAL_NODES = [
   {
     id: "node_1",
-    position: { x: 0, y: 0 },
+    position: { x: 0, y: 250 },
     data: { label: "Internet" },
   },
   {
     id: "node_2",
-    position: { x: 250, y: 0 },
+    position: { x: 0, y: 0 },
     data: { label: "Web Server" },
   },
   {
     id: "node_3",
-    position: { x: 500, y: 0 },
+    position: { x: 0, y: -250 },
     data: { label: "Database" },
   },
 ] as const;
