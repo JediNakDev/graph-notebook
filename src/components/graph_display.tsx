@@ -13,7 +13,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
-export default function NodeDisplay({
+export default function GraphDisplay({
   nodes,
   edges,
   onNodesChange,

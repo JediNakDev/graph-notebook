@@ -1,5 +1,6 @@
 import { type Edge, type Node } from "@xyflow/react";
 import { type Dispatch, type SetStateAction } from "react";
+import { saveGraph } from "./graph_storage";
 
 export type GraphCommandContext = {
   nodes: Node[];
@@ -10,7 +11,7 @@ export type GraphCommandContext = {
 };
 
 export function executeCommand(text: string, ctx: GraphCommandContext): void {
-  const { nodes, setNodes, setEdges, onLog } = ctx;
+  const { nodes, edges, setNodes, setEdges, onLog } = ctx;
   const list = text.trim().split(/\s+/);
   const cmd = list[0]?.toLowerCase();
   const subject = list[1]?.toLowerCase();
@@ -18,15 +19,14 @@ export function executeCommand(text: string, ctx: GraphCommandContext): void {
   if (cmd === "add" && subject === "node") {
     const label = list.slice(2).join(" ");
     if (!label) return;
-    const id = `node_${crypto.randomUUID()}`;
-    setNodes((prev) => [
-      ...prev,
-      {
-        id,
-        data: { label },
-        position: { x: Math.random() * 250, y: Math.random() * 250 },
-      },
-    ]);
+    const newNode: Node = {
+      id: `node_${crypto.randomUUID()}`,
+      data: { label },
+      position: { x: Math.random() * 250, y: Math.random() * 250 },
+    };
+    const nextNodes = [...nodes, newNode];
+    setNodes(nextNodes);
+    saveGraph(nextNodes, edges);
     onLog?.(`added node "${label}"`);
     return;
   }
@@ -39,10 +39,14 @@ export function executeCommand(text: string, ctx: GraphCommandContext): void {
     const source = nodes.find((n) => n.data.label === sourceLabel)?.id;
     const target = nodes.find((n) => n.data.label === targetLabel)?.id;
     if (!source || !target) return;
-    setEdges((prev) => [
-      ...prev,
-      { id: `edge_${crypto.randomUUID()}`, source, target },
-    ]);
+    const newEdge: Edge = {
+      id: `edge_${crypto.randomUUID()}`,
+      source,
+      target,
+    };
+    const nextEdges = [...edges, newEdge];
+    setEdges(nextEdges);
+    saveGraph(nodes, nextEdges);
     onLog?.(`${sourceLabel} → ${targetLabel}`);
     return;
   }
@@ -50,12 +54,17 @@ export function executeCommand(text: string, ctx: GraphCommandContext): void {
   if (cmd === "remove" && subject === "node") {
     const label = list.slice(2).join(" ");
     if (!label) return;
-    const ids = nodes.filter((n) => n.data.label === label).map((n) => n.id);
-    if (!ids.length) return;
-    setNodes((prev) => prev.filter((n) => !ids.includes(n.id)));
-    setEdges((prev) =>
-      prev.filter((e) => !ids.includes(e.source) && !ids.includes(e.target)),
+    const ids = new Set(
+      nodes.filter((n) => n.data.label === label).map((n) => n.id),
     );
+    if (ids.size === 0) return;
+    const nextNodes = nodes.filter((n) => !ids.has(n.id));
+    const nextEdges = edges.filter(
+      (e) => !ids.has(e.source) && !ids.has(e.target),
+    );
+    setNodes(nextNodes);
+    setEdges(nextEdges);
+    saveGraph(nextNodes, nextEdges);
     onLog?.(`removed node "${label}"`);
     return;
   }
@@ -68,9 +77,12 @@ export function executeCommand(text: string, ctx: GraphCommandContext): void {
     const source = nodes.find((n) => n.data.label === sourceLabel)?.id;
     const target = nodes.find((n) => n.data.label === targetLabel)?.id;
     if (!source || !target) return;
-    setEdges((prev) =>
-      prev.filter((e) => e.source !== source || e.target !== target),
+    const nextEdges = edges.filter(
+      (e) => e.source !== source || e.target !== target,
     );
+    if (nextEdges.length === edges.length) return;
+    setEdges(nextEdges);
+    saveGraph(nodes, nextEdges);
     onLog?.(`removed edge ${sourceLabel} ⇸ ${targetLabel}`);
   }
 }

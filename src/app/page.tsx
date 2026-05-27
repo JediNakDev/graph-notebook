@@ -7,25 +7,30 @@ import {
   type Edge,
   type Node,
 } from "@xyflow/react";
-import { Caveat, Newsreader } from "next/font/google";
-import { useCallback, useState } from "react";
-import NodeDisplay from "~/components/node_display";
-import NodeInput from "~/components/node_input";
-import { INITIAL_NODES, INITIAL_EDGES } from "./constant";
-
-const hand = Caveat({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
-const serif = Newsreader({ subsets: ["latin"], weight: ["300", "400", "500"], style: ["normal", "italic"] });
-
-const paperBg =
-  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='3'/><feColorMatrix values='0 0 0 0 0.45  0 0 0 0 0.35  0 0 0 0 0.2  0 0 0 0.08 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>";
+import { useCallback, useEffect, useState } from "react";
+import GraphDisplay from "~/components/graph_display";
+import GraphInput from "~/components/graph_input";
+import {
+  INITIAL_EDGES,
+  INITIAL_NODES,
+  INITIAL_JOT,
+  PAPER_BG,
+} from "~/lib/constants";
+import { loadGraph } from "~/lib/graph_storage";
 
 export default function Page() {
-  const [nodes, setNodes] = useState<Node[]>(INITIAL_NODES as unknown as Node[]);
-  const [edges, setEdges] = useState<Edge[]>(INITIAL_EDGES as unknown as Edge[]);
-  const [jot, setJot] = useState<string[]>([
-    "Internet → Web Server → Database",
-    "remember to label everything ✦",
-  ]);
+  const [nodes, setNodes] = useState<Node[]>(INITIAL_NODES);
+  const [edges, setEdges] = useState<Edge[]>(INITIAL_EDGES);
+  const [jot, setJot] = useState<string[]>(INITIAL_JOT);
+
+  useEffect(() => {
+    const saved = loadGraph();
+    if (saved) {
+      setNodes(saved.nodes);
+      setEdges(saved.edges);
+      setJot((h) => [...h, "✦ restored from last session"]);
+    }
+  }, []);
 
   const onNodesChange = useCallback(
     (changes: Parameters<typeof applyNodeChanges<Node>>[0]) =>
@@ -47,39 +52,53 @@ export default function Page() {
 
   return (
     <div
-      className={`${serif.className} min-h-screen text-[#2a241c] relative overflow-hidden`}
+      className={`font-display relative min-h-screen overflow-hidden text-[#2a241c]`}
       style={{ background: "#fbf6e9" }}
     >
       {/* paper grain */}
-      <div className="pointer-events-none fixed inset-0 opacity-70 mix-blend-multiply" style={{ backgroundImage: `url("${paperBg}")` }} />
+      <div
+        className="pointer-events-none fixed inset-0 opacity-70 mix-blend-multiply"
+        style={{ backgroundImage: `url("${PAPER_BG}")` }}
+      />
       {/* horizontal ruling */}
       <div
         className="pointer-events-none fixed inset-0 opacity-[0.18]"
-        style={{ backgroundImage: "repeating-linear-gradient(to bottom, transparent 0 31px, #6f8db8 31px 32px)" }}
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(to bottom, transparent 0 31px, #6f8db8 31px 32px)",
+        }}
       />
       {/* red margin */}
       <div className="pointer-events-none fixed top-0 bottom-0 left-[88px] w-px bg-[#d96456]/70" />
       <div className="pointer-events-none fixed top-0 bottom-0 left-[92px] w-px bg-[#d96456]/30" />
       {/* punched holes */}
-      <div className="pointer-events-none fixed left-[32px] top-[12%] w-5 h-5 rounded-full bg-[#e8e0cf] shadow-inner border border-[#cdbf9b]" />
-      <div className="pointer-events-none fixed left-[32px] top-[50%] w-5 h-5 rounded-full bg-[#e8e0cf] shadow-inner border border-[#cdbf9b]" />
-      <div className="pointer-events-none fixed left-[32px] top-[88%] w-5 h-5 rounded-full bg-[#e8e0cf] shadow-inner border border-[#cdbf9b]" />
+      <div className="pointer-events-none fixed top-[12%] left-[32px] h-5 w-5 rounded-full border border-[#cdbf9b] bg-[#e8e0cf] shadow-inner" />
+      <div className="pointer-events-none fixed top-[50%] left-[32px] h-5 w-5 rounded-full border border-[#cdbf9b] bg-[#e8e0cf] shadow-inner" />
+      <div className="pointer-events-none fixed top-[88%] left-[32px] h-5 w-5 rounded-full border border-[#cdbf9b] bg-[#e8e0cf] shadow-inner" />
 
-      <div className="relative z-10 pl-[120px] pr-10 pt-10 pb-12">
-        <header className="flex items-end justify-between mb-8">
+      <div className="relative z-10 pt-10 pr-10 pb-12 pl-[120px]">
+        <header className="mb-8 flex items-end justify-between">
           <div>
-            <div className={`${hand.className} text-[26px] text-[#d96456] -rotate-1 mb-1`}>
+            <div
+              className={`font-hand mb-1 -rotate-1 text-[26px] text-[#d96456]`}
+            >
               ~ tuesday afternoon, in the library ~
             </div>
-            <h1 className="text-[64px] leading-[0.95] tracking-[-0.02em] font-light">
-              graph <em className="italic font-normal">notebook</em>
-              <span className={`${hand.className} text-[42px] text-[#6f8db8] ml-3 -rotate-2 inline-block`}>(draft)</span>
+            <h1 className="text-[64px] leading-[0.95] font-light tracking-[-0.02em]">
+              graph <em className="font-normal italic">notebook</em>
+              <span
+                className={`font-hand ml-3 inline-block -rotate-2 text-[42px] text-[#6f8db8]`}
+              >
+                (draft)
+              </span>
             </h1>
-            <p className={`${hand.className} text-[22px] text-[#2a241c]/70 mt-2`}>
+            <p className={`font-hand mt-2 text-[22px] text-[#2a241c]/70`}>
               think out loud. draw boxes. connect them with little arrows.
             </p>
           </div>
-          <div className={`${hand.className} text-right text-[20px] leading-tight text-[#2a241c]/60 rotate-2`}>
+          <div
+            className={`font-hand rotate-2 text-right text-[20px] leading-tight text-[#2a241c]/60`}
+          >
             <div>page 1 / ∞</div>
             <div className="text-[#d96456]">no. 0001</div>
           </div>
@@ -88,15 +107,21 @@ export default function Page() {
         <div className="grid grid-cols-[1fr_340px] gap-8">
           {/* taped canvas */}
           <section className="relative">
-            <div className="absolute -top-3 left-12 w-24 h-7 bg-[#f6e3a1]/75 rotate-[-4deg] shadow-sm z-20"
-              style={{ clipPath: "polygon(2% 12%, 98% 4%, 99% 92%, 1% 88%)" }} />
-            <div className="absolute -top-3 right-16 w-28 h-7 bg-[#f6e3a1]/75 rotate-[5deg] shadow-sm z-20"
-              style={{ clipPath: "polygon(2% 6%, 98% 14%, 99% 92%, 1% 88%)" }} />
-            <div className="absolute -bottom-3 left-[40%] w-24 h-7 bg-[#f6e3a1]/75 rotate-[2deg] shadow-sm z-20"
-              style={{ clipPath: "polygon(2% 12%, 98% 4%, 99% 92%, 1% 88%)" }} />
+            <div
+              className="absolute -top-3 left-12 z-20 h-7 w-24 rotate-[-4deg] bg-[#f6e3a1]/75 shadow-sm"
+              style={{ clipPath: "polygon(2% 12%, 98% 4%, 99% 92%, 1% 88%)" }}
+            />
+            <div
+              className="absolute -top-3 right-16 z-20 h-7 w-28 rotate-[5deg] bg-[#f6e3a1]/75 shadow-sm"
+              style={{ clipPath: "polygon(2% 6%, 98% 14%, 99% 92%, 1% 88%)" }}
+            />
+            <div
+              className="absolute -bottom-3 left-[40%] z-20 h-7 w-24 rotate-[2deg] bg-[#f6e3a1]/75 shadow-sm"
+              style={{ clipPath: "polygon(2% 12%, 98% 4%, 99% 92%, 1% 88%)" }}
+            />
 
-            <div className="h-[70vh] bg-white border border-[#2a241c]/20 shadow-[0_18px_40px_-20px_rgba(42,36,28,0.35)] rounded-sm overflow-hidden">
-              <NodeDisplay
+            <div className="h-[70vh] overflow-hidden rounded-sm border border-[#2a241c]/20 bg-white shadow-[0_18px_40px_-20px_rgba(42,36,28,0.35)]">
+              <GraphDisplay
                 nodes={nodes}
                 edges={edges}
                 onNodesChange={onNodesChange}
@@ -105,7 +130,9 @@ export default function Page() {
               />
             </div>
 
-            <div className={`${hand.className} mt-3 text-[20px] text-[#2a241c]/60 italic flex justify-between`}>
+            <div
+              className={`font-hand mt-3 flex justify-between text-[20px] text-[#2a241c]/60 italic`}
+            >
               <span>↑ fig. 1 — the system, more or less</span>
               <span className="text-[#6f8db8]">drag the nodes around ↺</span>
             </div>
@@ -113,13 +140,15 @@ export default function Page() {
 
           {/* margin notes */}
           <aside className="flex flex-col gap-6">
-            {/* command input (default styled NodeInput, wrapped in a note slip) */}
-            <div className="relative bg-[#fffbf0] border border-[#2a241c]/20 p-5 shadow-[4px_5px_0_-1px_rgba(42,36,28,0.12)]">
-              <div className={`${hand.className} absolute -top-3 left-4 bg-[#d96456] text-[#fffbf0] px-2 py-0.5 text-[16px] -rotate-2 rounded-sm`}>
+            {/* command input (default styled GraphInput, wrapped in a note slip) */}
+            <div className="relative border border-[#2a241c]/20 bg-[#fffbf0] p-5 shadow-[4px_5px_0_-1px_rgba(42,36,28,0.12)]">
+              <div
+                className={`font-hand absolute -top-3 left-4 -rotate-2 rounded-sm bg-[#d96456] px-2 py-0.5 text-[16px] text-[#fffbf0]`}
+              >
                 tell the graph what to do →
               </div>
               <div className="mt-2">
-                <NodeInput
+                <GraphInput
                   nodes={nodes}
                   setNodes={setNodes}
                   edges={edges}
@@ -130,27 +159,51 @@ export default function Page() {
             </div>
 
             {/* grammar — index card */}
-            <div className="bg-[#fffbf0] border border-[#2a241c]/25 p-5 shadow-[3px_4px_0_-1px_rgba(42,36,28,0.12)] -rotate-[0.8deg]">
-              <div className="border-b border-[#d96456]/50 pb-1 mb-3">
-                <div className={`${hand.className} text-[24px] text-[#2a241c]`}>cheat sheet</div>
+            <div className="-rotate-[0.8deg] border border-[#2a241c]/25 bg-[#fffbf0] p-5 shadow-[3px_4px_0_-1px_rgba(42,36,28,0.12)]">
+              <div className="mb-3 border-b border-[#d96456]/50 pb-1">
+                <div className={`font-hand text-[24px] text-[#2a241c]`}>
+                  cheat sheet
+                </div>
               </div>
-              <ul className={`${hand.className} text-[20px] leading-[1.55] text-[#2a241c]/85 space-y-0.5`}>
-                <li><span className="text-[#d96456]">+</span> add node <span className="italic text-[#6f8db8]">label</span></li>
-                <li><span className="text-[#d96456]">−</span> remove node <span className="italic text-[#6f8db8]">label</span></li>
-                <li><span className="text-[#d96456]">+</span> add edge from <span className="italic text-[#6f8db8]">a</span> to <span className="italic text-[#6f8db8]">b</span></li>
-                <li><span className="text-[#d96456]">−</span> remove edge from <span className="italic text-[#6f8db8]">a</span> to <span className="italic text-[#6f8db8]">b</span></li>
+              <ul
+                className={`font-hand space-y-0.5 text-[20px] leading-[1.55] text-[#2a241c]/85`}
+              >
+                <li>
+                  <span className="text-[#d96456]">+</span> add node{" "}
+                  <span className="text-[#6f8db8] italic">label</span>
+                </li>
+                <li>
+                  <span className="text-[#d96456]">−</span> remove node{" "}
+                  <span className="text-[#6f8db8] italic">label</span>
+                </li>
+                <li>
+                  <span className="text-[#d96456]">+</span> add edge from{" "}
+                  <span className="text-[#6f8db8] italic">a</span> to{" "}
+                  <span className="text-[#6f8db8] italic">b</span>
+                </li>
+                <li>
+                  <span className="text-[#d96456]">−</span> remove edge from{" "}
+                  <span className="text-[#6f8db8] italic">a</span> to{" "}
+                  <span className="text-[#6f8db8] italic">b</span>
+                </li>
               </ul>
-              <div className={`${hand.className} mt-3 text-[18px] text-[#2a241c]/55 italic border-t border-dashed border-[#2a241c]/20 pt-2`}>
+              <div
+                className={`font-hand mt-3 border-t border-dashed border-[#2a241c]/20 pt-2 text-[18px] text-[#2a241c]/55 italic`}
+              >
                 p.s. labels can have spaces.
               </div>
             </div>
 
             {/* jotted log */}
-            <div className="bg-[#fffbf0] border border-[#2a241c]/20 p-5 shadow-[4px_5px_0_-1px_rgba(42,36,28,0.12)] rotate-[0.4deg] flex-1">
-              <div className={`${hand.className} text-[22px] text-[#2a241c] border-b border-dotted border-[#2a241c]/30 pb-1 mb-3`}>
+            <div className="flex-1 rotate-[0.4deg] border border-[#2a241c]/20 bg-[#fffbf0] p-5 shadow-[4px_5px_0_-1px_rgba(42,36,28,0.12)]">
+              <div
+                className={`font-hand mb-3 border-b border-dotted border-[#2a241c]/30 pb-1 text-[22px] text-[#2a241c]`}
+              >
                 scribbles
               </div>
-              <ul className={`${hand.className} text-[19px] leading-[1.5] text-[#2a241c]/80 space-y-1`}>
+              <ul
+                className={`font-hand space-y-1 text-[19px] leading-[1.5] text-[#2a241c]/80`}
+              >
                 {jot.map((j, i) => (
                   <li key={i} className="flex gap-2">
                     <span className="text-[#6f8db8]">·</span>
@@ -160,7 +213,9 @@ export default function Page() {
               </ul>
             </div>
 
-            <div className={`${hand.className} text-[18px] text-[#2a241c]/45 text-center italic`}>
+            <div
+              className={`font-hand text-center text-[18px] text-[#2a241c]/45 italic`}
+            >
               — kept loose in a leather folio —
             </div>
           </aside>

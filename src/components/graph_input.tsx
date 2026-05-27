@@ -6,7 +6,7 @@ import { executeCommand } from "~/lib/graph_commands";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
-export default function NodeInput({
+export default function GraphInput({
   nodes,
   setNodes,
   edges,

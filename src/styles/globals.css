@@ -7,6 +7,8 @@
 @theme {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-hand: var(--font-caveat), "Comic Sans MS", cursive;
+  --font-display: var(--font-newsreader), ui-serif, Georgia, serif;
 }
 
 @theme inline {

@@ -1,7 +1,7 @@
 import "~/styles/globals.css";
 
 import { type Metadata } from "next";
-import { Caveat, Geist, Inter } from "next/font/google";
+import { Caveat, Geist, Inter, Newsreader } from "next/font/google";
 import { cn } from "~/lib/utils";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -21,13 +21,26 @@ const caveat = Caveat({
   variable: "--font-caveat",
 });
 
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  style: ["normal", "italic"],
+  variable: "--font-newsreader",
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
       lang="en"
-      className={cn(geist.variable, "font-sans", inter.variable, caveat.variable)}
+      className={cn(
+        geist.variable,
+        "font-sans",
+        inter.variable,
+        caveat.variable,
+        newsreader.variable,
+      )}
     >
       <body>{children}</body>
     </html>
