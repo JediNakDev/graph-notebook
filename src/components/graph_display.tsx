@@ -19,16 +19,36 @@ export default function GraphDisplay({
   onNodesChange,
   onEdgesChange,
   onConnect,
+  activeNodeId,
 }: {
   nodes: Node[];
   edges: Edge[];
   onNodesChange: OnNodesChange<Node>;
   onEdgesChange: OnEdgesChange<Edge>;
   onConnect: OnConnect;
+  activeNodeId?: string | null;
 }) {
+  const decorated = activeNodeId
+    ? nodes.map((n) =>
+        n.id === activeNodeId
+          ? {
+              ...n,
+              style: {
+                ...n.style,
+                background: "#fffbf0",
+                border: "1.5px solid #d96456",
+                borderRadius: 2,
+                boxShadow: "3px 4px 0 -1px rgba(217,100,86,0.35)",
+                color: "#2a241c",
+              },
+            }
+          : n,
+      )
+    : nodes;
+
   return (
     <ReactFlow
-      nodes={nodes}
+      nodes={decorated}
       edges={edges}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}

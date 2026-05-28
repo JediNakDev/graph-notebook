@@ -10,11 +10,14 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import GraphDisplay from "~/components/graph_display";
 import GraphInput from "~/components/graph_input";
+import TracePanel from "~/components/trace_panel";
 import {
   INITIAL_EDGES,
   INITIAL_NODES,
   INITIAL_JOT,
   PAPER_BG,
+  SAMPLE_TRACE,
+  type TraceStep,
 } from "~/lib/constants";
 import { loadGraph } from "~/lib/graph_storage";
 
@@ -22,6 +25,9 @@ export default function Page() {
   const [nodes, setNodes] = useState<Node[]>(INITIAL_NODES);
   const [edges, setEdges] = useState<Edge[]>(INITIAL_EDGES);
   const [jot, setJot] = useState<string[]>(INITIAL_JOT);
+  const [trace] = useState<TraceStep[]>(SAMPLE_TRACE);
+  const [stepIndex, setStepIndex] = useState(0);
+  const activeNodeId = trace[stepIndex]?.nodeId ?? null;
 
   useEffect(() => {
     const saved = loadGraph();
@@ -127,6 +133,7 @@ export default function Page() {
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
+                activeNodeId={activeNodeId}
               />
             </div>
 
@@ -196,6 +203,14 @@ export default function Page() {
                 p.s. labels can have spaces.
               </div>
             </div>
+
+            {/* trace panel */}
+            <TracePanel
+              trace={trace}
+              stepIndex={stepIndex}
+              setStepIndex={setStepIndex}
+              nodes={nodes}
+            />
 
             {/* jotted log */}
             <div className="flex-1 rotate-[0.4deg] border border-[#2a241c]/20 bg-[#fffbf0] p-5 shadow-[4px_5px_0_-1px_rgba(42,36,28,0.12)]">

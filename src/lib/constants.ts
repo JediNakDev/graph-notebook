@@ -27,6 +27,18 @@ export const INITIAL_EDGES: Edge[] = [
   { id: "edge_b", source: "node_2", target: "node_3" },
 ];
 
+export type TraceStep = {
+  step: number;
+  nodeId: string;
+  description: string;
+};
+
+export const SAMPLE_TRACE: TraceStep[] = [
+  { step: 1, nodeId: "node_1", description: "Attacker starts from Internet" },
+  { step: 2, nodeId: "node_2", description: "Attacker reaches Web Server" },
+  { step: 3, nodeId: "node_3", description: "Attacker accesses Database" },
+];
+
 export const INITIAL_JOT = [
   "Internet → Web Server → Database",
   "remember to label everything ✦",
