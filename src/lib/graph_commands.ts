@@ -1,5 +1,6 @@
 import { type Edge, type Node } from "@xyflow/react";
 import { type Dispatch, type SetStateAction } from "react";
+import { INITIAL_EDGES, INITIAL_NODES } from "./constants";
 import { saveGraph } from "./graph_storage";
 
 export type GraphCommandContext = {
@@ -15,6 +16,14 @@ export function executeCommand(text: string, ctx: GraphCommandContext): void {
   const list = text.trim().split(/\s+/);
   const cmd = list[0]?.toLowerCase();
   const subject = list[1]?.toLowerCase();
+
+  if (cmd === "reset") {
+    setNodes(INITIAL_NODES);
+    setEdges(INITIAL_EDGES);
+    saveGraph(INITIAL_NODES, INITIAL_EDGES);
+    onLog?.("reset to initial state");
+    return;
+  }
 
   if (cmd === "add" && subject === "node") {
     const label = list.slice(2).join(" ");

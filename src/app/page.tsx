@@ -186,6 +186,9 @@ export default function Page() {
                   <span className="text-[#6f8db8] italic">a</span> to{" "}
                   <span className="text-[#6f8db8] italic">b</span>
                 </li>
+                <li>
+                  <span className="text-[#d96456]">↺</span> reset
+                </li>
               </ul>
               <div
                 className={`font-hand mt-3 border-t border-dashed border-[#2a241c]/20 pt-2 text-[18px] text-[#2a241c]/55 italic`}
