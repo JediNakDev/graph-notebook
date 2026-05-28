@@ -83,36 +83,37 @@ export default function Page() {
       <div className="pointer-events-none fixed top-[88%] left-[32px] h-5 w-5 rounded-full border border-[#cdbf9b] bg-[#e8e0cf] shadow-inner" />
 
       <div className="relative z-10 pt-10 pr-10 pb-12 pl-[120px]">
-        <header className="mb-8 flex items-end justify-between">
+        <div className="grid grid-cols-[1fr_340px] items-start gap-8">
           <div>
-            <div
-              className={`font-hand mb-1 -rotate-1 text-[26px] text-[#d96456]`}
-            >
-              ~ tuesday afternoon, in the library ~
-            </div>
-            <h1 className="text-[64px] leading-[0.95] font-light tracking-[-0.02em]">
-              graph <em className="font-normal italic">notebook</em>
-              <span
-                className={`font-hand ml-3 inline-block -rotate-2 text-[42px] text-[#6f8db8]`}
+            <header className="mb-8 flex items-end justify-between">
+              <div>
+                <div
+                  className={`font-hand mb-1 -rotate-1 text-[26px] text-[#d96456]`}
+                >
+                  ~ tuesday afternoon, in the library ~
+                </div>
+                <h1 className="text-[64px] leading-[0.95] font-light tracking-[-0.02em]">
+                  graph <em className="font-normal italic">notebook</em>
+                  <span
+                    className={`font-hand ml-3 inline-block -rotate-2 text-[42px] text-[#6f8db8]`}
+                  >
+                    (draft)
+                  </span>
+                </h1>
+                <p className={`font-hand mt-2 text-[22px] text-[#2a241c]/70`}>
+                  think out loud. draw boxes. connect them with little arrows.
+                </p>
+              </div>
+              <div
+                className={`font-hand rotate-2 text-right text-[20px] leading-tight text-[#2a241c]/60`}
               >
-                (draft)
-              </span>
-            </h1>
-            <p className={`font-hand mt-2 text-[22px] text-[#2a241c]/70`}>
-              think out loud. draw boxes. connect them with little arrows.
-            </p>
-          </div>
-          <div
-            className={`font-hand rotate-2 text-right text-[20px] leading-tight text-[#2a241c]/60`}
-          >
-            <div>page 1 / ∞</div>
-            <div className="text-[#d96456]">no. 0001</div>
-          </div>
-        </header>
+                <div>page 1 / ∞</div>
+                <div className="text-[#d96456]">no. 0001</div>
+              </div>
+            </header>
 
-        <div className="grid grid-cols-[1fr_340px] gap-8">
-          {/* taped canvas */}
-          <section className="relative">
+            {/* taped canvas */}
+            <section className="relative">
             <div
               className="absolute -top-3 left-12 z-20 h-7 w-24 rotate-[-4deg] bg-[#f6e3a1]/75 shadow-sm"
               style={{ clipPath: "polygon(2% 12%, 98% 4%, 99% 92%, 1% 88%)" }}
@@ -143,7 +144,8 @@ export default function Page() {
               <span>↑ fig. 1 — the system, more or less</span>
               <span className="text-[#6f8db8]">drag the nodes around ↺</span>
             </div>
-          </section>
+            </section>
+          </div>
 
           {/* margin notes */}
           <aside className="flex flex-col gap-6">
