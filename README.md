@@ -1,29 +1,59 @@
-# Create T3 App
+# graph notebook
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+## Running locally
 
-## What's next? How do I make an app with this?
+Requires Node 20+. Works with npm, pnpm, yarn, or bun.
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+```bash
+npm install
+npm run dev
+```
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+Then open http://localhost:3000.
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+Other scripts:
 
-## Learn More
+- `npm run build` — production build
+- `npm run start` — serve the production build
+- `npm run check` — lint + typecheck
+- `npm run format:write` — Prettier
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+## Supported commands
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+The input accepts one command per submission. Keywords are case-insensitive; labels are case-sensitive and may contain spaces.
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+| Command                       | Effect                                                         |
+| ----------------------------- | -------------------------------------------------------------- |
+| `add node <label>`            | Append a node with the given label at a random position.       |
+| `remove node <label>`         | Remove every node matching the label, plus any incident edges. |
+| `add edge from <a> to <b>`    | Add a directed edge from node `a` to node `b`.                 |
+| `remove edge from <a> to <b>` | Remove the matching directed edge.                             |
+| `reset`                       | Restore the initial graph (prompts for confirmation).          |
 
-## How do I deploy this?
+Examples:
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+```
+add node Cache
+add node Database
+add edge from Cache to Database
+remove edge from Cache to Database
+remove node Cache
+reset
+```
+
+Expected behavior:
+
+- A valid command clears the input and logs a line in the "scribbles" panel.
+- An invalid command leaves the input intact and surfaces an inline error (e.g. `no node named "Cache"`, `use: add edge from <a> to <b>`).
+- `reset` opens a confirmation dialog; cancelling is a no-op.
+- The graph is persisted to `localStorage` after every successful mutation and restored on reload.
+- Nodes can also be dragged on the canvas; positions are persisted.
+
+## Design decisions and assumptions
+
+- **Stack.** Next.js App Router + React 19, Tailwind v4, shadcn/Radix primitives, React flow for the canvas, Zod for validating persisted state.
+- **Label as identity.** Commands address nodes by label rather than id. Duplicate labels are allowed at the data layer, but `remove node <label>` deletes all matches — labels are assumed unique in practice. Internal ids are UUIDs so the React Flow renderer stays stable across edits.
+- **Persistence.** State is saved to `localStorage` after every mutation and validated with Zod on load (`src/lib/graph_storage.ts`). Invalid or absent storage falls back silently to the initial graph.
+- **State shape.** `nodes` and `edges` live in the page component and are passed down. No global store — the app is small enough that prop-drilling is clearer than introducing context or a reducer.
+- **Destructive actions.** Only `reset` requires confirmation. Removing a node implicitly removes its incident edges without a prompt; this is treated as expected.
+- **Trace panel.** Currently shows a hard coded sample trace from `constants.ts` and highlights the active node on the canvas. The intent is that a future algorithm runner will produce real `TraceStep[]` values consumed by the same panel.
