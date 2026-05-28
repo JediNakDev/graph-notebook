@@ -85,7 +85,7 @@ export default function Page() {
       <div className="relative z-10 pt-10 pr-10 pb-12 pl-[120px]">
         <div className="grid grid-cols-[1fr_340px] items-start gap-8">
           <div>
-            <header className="mb-8 flex items-end justify-between">
+            <header className="mb-8 flex items-end justify-between gap-8">
               <div>
                 <div
                   className={`font-hand mb-1 -rotate-1 text-[26px] text-[#d96456]`}
@@ -104,11 +104,13 @@ export default function Page() {
                   think out loud. draw boxes. connect them with little arrows.
                 </p>
               </div>
-              <div
-                className={`font-hand rotate-2 text-right text-[20px] leading-tight text-[#2a241c]/60`}
-              >
-                <div>page 1 / ∞</div>
-                <div className="text-[#d96456]">no. 0001</div>
+              <div className="w-[340px] shrink-0">
+                <TracePanel
+                  trace={trace}
+                  stepIndex={stepIndex}
+                  setStepIndex={setStepIndex}
+                  nodes={nodes}
+                />
               </div>
             </header>
 
@@ -205,14 +207,6 @@ export default function Page() {
                 p.s. labels can have spaces.
               </div>
             </div>
-
-            {/* trace panel */}
-            <TracePanel
-              trace={trace}
-              stepIndex={stepIndex}
-              setStepIndex={setStepIndex}
-              nodes={nodes}
-            />
 
             {/* jotted log */}
             <div className="flex-1 rotate-[0.4deg] border border-[#2a241c]/20 bg-[#fffbf0] p-5 shadow-[4px_5px_0_-1px_rgba(42,36,28,0.12)]">
