@@ -1,4 +1,4 @@
-# graph notebook
+# Graph Notebook
 
 ## Running locally
 
