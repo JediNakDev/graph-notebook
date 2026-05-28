@@ -57,3 +57,12 @@ Expected behavior:
 - **State shape.** `nodes` and `edges` live in the page component and are passed down. No global store — the app is small enough that prop-drilling is clearer than introducing context or a reducer.
 - **Destructive actions.** Only `reset` requires confirmation. Removing a node implicitly removes its incident edges without a prompt; this is treated as expected.
 - **Trace panel.** Currently shows a hard coded sample trace from `constants.ts` and highlights the active node on the canvas. The intent is that a future algorithm runner will produce real `TraceStep[]` values consumed by the same panel.
+
+## Possible future implementation
+
+- Allow more flexible input or integrate LLM
+- Migrate state manager to zustand
+- Allow customization on simulation trace
+- Implement actual authentication and database.ß
+- Allow multiple graphs per client or user
+- PNG/SVG export
